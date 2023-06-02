@@ -1,24 +1,24 @@
-﻿using Microsoft.Graph;
-using Microsoft.Graph.Models;
+﻿using Microsoft.Graph.Models;
 using System.Security.Cryptography;
 
 namespace AzureAdPasswordReset;
 
-public class AadGraphApiDelegatedClient
+public class AadGraphSdkManagedIdentityAppClient
 {
-    private readonly GraphServiceClient _graphServiceClient;
+    private readonly GraphApplicationClientService _graphService;
 
-    public AadGraphApiDelegatedClient(GraphServiceClient graphServiceClient)
+    public AadGraphSdkManagedIdentityAppClient(GraphApplicationClientService graphService)
     {
-        _graphServiceClient = graphServiceClient;
+        _graphService = graphService;
     }
-
 
     public async Task<User?> ResetPassword(string oid)
     {
-        var user = await _graphServiceClient.Users[oid].GetAsync();
+        var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
 
-        if(user == null)
+        var user = await graphServiceClient.Users[oid].GetAsync();
+
+        if (user == null)
         {
             throw new ArgumentNullException(nameof(oid));
         }
@@ -29,7 +29,7 @@ public class AadGraphApiDelegatedClient
             Password = GetRandomString(),
         };
 
-        var result = await _graphServiceClient.Users[oid].PatchAsync(user);
+        var result = await graphServiceClient.Users[oid].PatchAsync(user);
 
         return result;
     }
@@ -44,6 +44,5 @@ public class AadGraphApiDelegatedClient
     {
         return RandomNumberGenerator.GetInt32(100000000, int.MaxValue);
     }
-
 
 }
