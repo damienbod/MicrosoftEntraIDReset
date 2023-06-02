@@ -37,6 +37,21 @@ public class AadGraphSdkManagedIdentityAppClient
         return result;
     }
 
+    public async Task<UserCollectionResponse?> FindUsers(string search)
+    {
+        var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
+
+        var result = await graphServiceClient.Users.GetAsync((requestConfiguration) =>
+        {
+            requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
+            requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
+            requestConfiguration.QueryParameters.Count = true;
+            requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
+        });
+
+        return result;
+    }
+
     private static string GetRandomString()
     {
         var random = $"{GenerateRandom()}{GenerateRandom()}{GenerateRandom()}{GenerateRandom()}-AC";
