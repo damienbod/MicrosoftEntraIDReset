@@ -12,17 +12,8 @@ public class IndexModel : PageModel
     }
     public async Task OnGetAsync()
     {
-        var usersCollectionResponse = await _graphUsers.FindUsers("f");
+        var usersCollectionResponse = await _graphUsers.FindUsers("li");
 
-        var users = usersCollectionResponse.Value.ToList();
-        //CurrentPage.Select(app => new PolicyAssignedApplicationsDto
-        //{
-        //    Id = app.Id,
-        //    DisplayName = app.DisplayName,
-        //    AppId = app.AppId,
-        //    SignInAudience = app.SignInAudience,
-        //    PolicyAssigned = GetFirstTokenLifetimePolicy(app.TokenLifetimePolicies)
-
-        //}).ToList();
+        var users = usersCollectionResponse.Value!.ToList();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Graph.Models;
 using System.Security.Cryptography;
+using Microsoft.Graph.Users;
+using Microsoft.Kiota.Abstractions;
 
 namespace AzureAdPasswordReset;
 
@@ -43,7 +45,11 @@ public class AadGraphSdkManagedIdentityAppClient
 
         var result = await graphServiceClient.Users.GetAsync((requestConfiguration) =>
         {
-            requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
+            requestConfiguration.QueryParameters.Top = 10;
+            if(!string.IsNullOrEmpty(search))
+            {
+                requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
+            }
             requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
             requestConfiguration.QueryParameters.Count = true;
             requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
