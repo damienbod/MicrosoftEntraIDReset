@@ -12,15 +12,15 @@ public class IndexModel : PageModel
     {
         _graphUsers = graphUsers;
     }
-    public async Task OnGetAsync()
-    {
-        var usersCollectionResponse = await _graphUsers.FindUsers("li");
 
-        var users = usersCollectionResponse.Value!.ToList();
+    public void OnGet()
+    {
     }
 
     public async Task<ActionResult> OnGetAutoCompleteSuggest(string term)
     {
+        if (term == "*") term = string.Empty;
+
         var usersCollectionResponse = await _graphUsers.FindUsers(term);
 
         var users = usersCollectionResponse!.Value!.ToList();
@@ -28,8 +28,8 @@ public class IndexModel : PageModel
         var usersDisplay = users.Select(user => new
         {
             Id = user.Id,
-            Upn = user.UserPrincipalName,
-            DisplayName = user.DisplayName,
+            UserPrincipalName = user.UserPrincipalName,
+            DisplayName = user.DisplayName
         });
 
         SearchText = term;

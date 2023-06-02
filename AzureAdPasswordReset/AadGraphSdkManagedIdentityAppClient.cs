@@ -43,15 +43,18 @@ public class AadGraphSdkManagedIdentityAppClient
     {
         var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
 
+
         var result = await graphServiceClient.Users.GetAsync((requestConfiguration) =>
         {
             requestConfiguration.QueryParameters.Top = 10;
-            if(!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search))
             {
                 requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
             }
             requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
             requestConfiguration.QueryParameters.Count = true;
+            requestConfiguration.QueryParameters.Select = new string[] { "id", "displayName", "userPrincipalName", "userType" };
+            requestConfiguration.QueryParameters.Filter = "userType eq 'Member'";
             requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
         });
 
