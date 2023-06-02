@@ -12,6 +12,9 @@ public class AadGraphSdkManagedIdentityAppClient
         _graphService = graphService;
     }
 
+    /// <summary>
+    /// User.ReadWrite.All permission required
+    /// </summary>
     public async Task<User?> ResetPassword(string oid)
     {
         var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
