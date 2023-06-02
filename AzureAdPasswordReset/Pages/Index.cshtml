@@ -26,9 +26,15 @@
         <span id="docFamilyName"></span>
     </h5>
     <div class="card-body">
-        <p class="card-text">Id: <span id="userId"></span></p>
-        <p class="card-text">UPN: <span id="userPrincipalName"></span></p>
         <p class="card-text">DisplayName: <span id="userDisplayName"></span></p>
+
+        <form method="post">
+            <input type="hidden" id="userId" name="userId" />
+            <input type="hidden" id="userPrincipalName" name="userPrincipalName" />
+            <div class="form-group">
+                <button type="submit" class="btn-secondary">Reset Password</button>
+            </div>
+        </form>
     </div>
 </div>
 

@@ -7,6 +7,8 @@ public class IndexModel : PageModel
 {
     private AadGraphSdkManagedIdentityAppClient _graphUsers;
     public string? SearchText { get; set; }
+    public string? UserId { get; set; }
+    public string? UserPrincipalName { get; set; }
 
     public IndexModel(AadGraphSdkManagedIdentityAppClient graphUsers)
     {
@@ -35,5 +37,14 @@ public class IndexModel : PageModel
         SearchText = term;
 
         return new JsonResult(usersDisplay);
+    }
+
+    public IActionResult OnPost()
+    {
+        var id = UserId;
+        var upn = UserPrincipalName;
+
+        
+        return Redirect($"~/PasswordResetComplete");
     }
 }
