@@ -7,8 +7,6 @@ public class IndexModel : PageModel
 {
     private AadGraphSdkManagedIdentityAppClient _graphUsers;
     public string? SearchText { get; set; }
-    public string? UserId { get; set; }
-    public string? UserPrincipalName { get; set; }
 
     public IndexModel(AadGraphSdkManagedIdentityAppClient graphUsers)
     {
@@ -41,10 +39,9 @@ public class IndexModel : PageModel
 
     public IActionResult OnPost()
     {
-        var id = UserId;
-        var upn = UserPrincipalName;
+        var id = Request.Form.FirstOrDefault(u => u.Key == "userId").Value;
+        var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value;
 
-        
         return Redirect($"~/PasswordResetComplete");
     }
 }

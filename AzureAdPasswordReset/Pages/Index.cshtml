@@ -70,9 +70,9 @@
                     });
                 },
                 select: function (event, ui) {
-                    $("#userId").text(ui.item.data.id);
                     $("#userDisplayName").text(ui.item.data.displayName);
-                    $("#userPrincipalName").text(ui.item.data.userPrincipalName); 
+                    document.getElementById("userId").value = ui.item.data.id;
+                    document.getElementById("userPrincipalName").value = ui.item.data.userPrincipalName;
                     console.log(ui.item);
                 }
             });
