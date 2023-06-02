@@ -54,7 +54,7 @@ public class AadGraphSdkManagedIdentityAppClient
             requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
             requestConfiguration.QueryParameters.Count = true;
             requestConfiguration.QueryParameters.Select = new string[] { "id", "displayName", "userPrincipalName", "userType" };
-            requestConfiguration.QueryParameters.Filter = "userType eq 'Member'";
+            requestConfiguration.QueryParameters.Filter = "userType eq 'Member'"; // onPremisesSyncEnabled eq false
             requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
         });
 
