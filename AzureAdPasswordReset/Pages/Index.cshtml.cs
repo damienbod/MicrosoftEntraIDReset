@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Runtime.InteropServices;
 
 namespace AzureAdPasswordReset.Pages;
 
@@ -42,13 +43,19 @@ public class IndexModel : PageModel
         return new JsonResult(usersDisplay);
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPostAsync()
     {
-        var id = Request.Form.FirstOrDefault(u => u.Key == "userId").Value;
-        var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value;
+        var id = Request.Form.FirstOrDefault(u => u.Key == "userId").Value.FirstOrDefault();
+        var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value.FirstOrDefault();
 
-        Upn = upn;
-        Password = "Test01";
+        if(!string.IsNullOrEmpty(id))
+        {
+            var result = await _graphUsers.ResetPassword(id);
+            Upn = result.Upn;
+            Password = result.Password;
+            return Page();
+        }
+
         return Page();
     }
 }

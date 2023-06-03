@@ -1,7 +1,6 @@
 ﻿using Microsoft.Graph.Models;
 using System.Security.Cryptography;
-using Microsoft.Graph.Users;
-using Microsoft.Kiota.Abstractions;
+using Microsoft.Graph.Users.Item.Authentication.Methods.Item.ResetPassword;
 
 namespace AzureAdPasswordReset;
 
@@ -15,10 +14,12 @@ public class AadGraphSdkManagedIdentityAppClient
     }
 
     /// <summary>
-    /// User.ReadWrite.All permission required
+    /// User.Read.All and UserAuthenticationMethod.ReadWrite.All permission required
+    /// https://learn.microsoft.com/en-us/graph/api/authenticationmethod-resetpassword?view=graph-rest-1.0&tabs=csharp
     /// </summary>
-    public async Task<User?> ResetPassword(string oid)
+    public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
+        var password = GetRandomString();
         var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
 
         var user = await graphServiceClient.Users[oid].GetAsync();
@@ -28,15 +29,37 @@ public class AadGraphSdkManagedIdentityAppClient
             throw new ArgumentNullException(nameof(oid));
         }
 
-        user.PasswordProfile = new PasswordProfile
+        var methods = await graphServiceClient
+            .Users[oid].Authentication.Methods.GetAsync();
+
+        // "28c10230-6103-485e-b985-444c60001490" == password
+        if (!methods!.Value!.Exists(au => au.Id == "28c10230-6103-485e-b985-444c60001490"))
         {
-            ForceChangePasswordNextSignIn = true,
-            Password = GetRandomString(),
+            throw new ArgumentNullException(nameof(oid));
+        }
+
+        var requestBody = new ResetPasswordPostRequestBody
+        {
+            NewPassword = password,
         };
 
-        var result = await graphServiceClient.Users[oid].PatchAsync(user);
+        try {
+            var result = await graphServiceClient.Users[oid]
+              .Authentication
+              .Methods["28c10230-6103-485e-b985-444c60001490"]
+              .ResetPassword
+              .PostAsync(requestBody);
 
-        return result;
+            return (user.UserPrincipalName, result!.NewPassword);
+        }
+        catch(Exception ex)
+        {
+            var sss = ex.Message;
+        }
+      
+
+
+        return (null, null);
     }
 
     public async Task<UserCollectionResponse?> FindUsers(string search)
