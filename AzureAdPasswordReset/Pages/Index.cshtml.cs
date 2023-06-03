@@ -8,6 +8,11 @@ public class IndexModel : PageModel
     private AadGraphSdkManagedIdentityAppClient _graphUsers;
     public string? SearchText { get; set; }
 
+    [BindProperty]
+    public string? Upn { get; set; } = null;
+    [BindProperty]
+    public string? Password { get; set; } = null;
+
     public IndexModel(AadGraphSdkManagedIdentityAppClient graphUsers)
     {
         _graphUsers = graphUsers;
@@ -42,6 +47,8 @@ public class IndexModel : PageModel
         var id = Request.Form.FirstOrDefault(u => u.Key == "userId").Value;
         var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value;
 
-        return Redirect($"~/PasswordResetComplete");
+        Upn = upn;
+        Password = "Test01";
+        return Page();
     }
 }

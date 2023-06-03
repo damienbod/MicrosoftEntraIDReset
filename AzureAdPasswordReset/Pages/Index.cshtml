@@ -4,42 +4,53 @@
     ViewData["Title"] = "Reset a password for a user";
 }
 
-<fieldset class="form">
-    <legend>Search for a user</legend>
-    <table width="500">
-        <tr>
-            <th></th>
-        </tr>
-        <tr>
-            <td>
-                <input class="form-control" id="autocomplete" type="text" style="width:500px" />
-            </td>
-        </tr>
-    </table>
-</fieldset>
+@if (string.IsNullOrEmpty(Model.Password))
+{
+    <fieldset class="form">
+        <legend>Search for a user</legend>
+        <table class="col-12">
+            <tr>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                    <input class="form-control col-12" id="autocomplete" type="text" />
+                </td>
+            </tr>
+        </table>
+    </fieldset>
 
-<br />
+    <br />
 
-<div class="card">
-    <h5 class="card-header">
-        <span id="docName"></span>
-        <span id="docFamilyName"></span>
-    </h5>
-    <div class="card-body">
-        <p class="card-text">DisplayName: <span id="userDisplayName"></span></p>
+    <div class="card">
+        <h5 class="card-header"></h5>
+        <div class="card-body">
+            <p class="card-text">DisplayName: <span id="userDisplayName"></span></p>
 
-        <form method="post">
-            <input type="hidden" id="userId" name="userId" />
-            <input type="hidden" id="userPrincipalName" name="userPrincipalName" />
-            <div class="form-group">
-                <button type="submit" class="btn-secondary">Reset Password</button>
-            </div>
-        </form>
+            <form method="post">
+                <input type="hidden" id="userId" name="userId" />
+                <input type="hidden" id="userPrincipalName" name="userPrincipalName" />
+                <div class="form-group">
+                    <button type="submit" class="btn-secondary">Reset Password</button>
+                </div>
+            </form>
+        </div>
+        </div>
+}
+else
+{
+    <div class="card">
+        <h5 class="card-header"></h5>
+        <div class="card-body">
+            <p class="card-text">User: <span>@Model.Upn</span></p>
+            <p class="card-text">Password: <span>@Model.Password</span></p>
+        </div>
     </div>
-</div>
+}
+
 
 @section scripts
-    {
+{
     <script type="text/javascript">
         var items;
         $(document).ready(function () {
