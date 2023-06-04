@@ -11,8 +11,6 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddDistributedMemoryCache();
 
-        //builder.Services.AddSingleton<GraphApplicationClientService>();
-        //builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK5>();
         builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK4>();
 
         string[]? initialScopes = builder.Configuration.GetValue<string>("GraphScopes")?.Split(' ');
