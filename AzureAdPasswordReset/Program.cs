@@ -15,9 +15,15 @@ public class Program
         //builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK5>();
         builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK4>();
 
+        string[]? initialScopes = builder.Configuration.GetValue<string>("GraphScopes")?.Split(' ');
+
+        var baseAddress = builder.Configuration["GraphApi:BaseUrl"];
+        baseAddress ??= "https://graph.microsoft.com/beta";
+
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-            .EnableTokenAcquisitionToCallDownstreamApi()
+            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+            .AddMicrosoftGraph(baseAddress, "https://graph.microsoft.com/.default")
             .AddDistributedTokenCaches();
 
         builder.Services.AddAuthorization(options =>

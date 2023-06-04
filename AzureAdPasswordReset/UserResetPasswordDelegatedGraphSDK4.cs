@@ -1,84 +1,68 @@
-﻿using Microsoft.Graph.Models;
-using System.Security.Cryptography;
-using Microsoft.Graph.Users.Item.Authentication.Methods.Item.ResetPassword;
+﻿using System.Security.Cryptography;
 using Microsoft.Graph;
 
 namespace AzureAdPasswordReset;
 
 public class UserResetPasswordDelegatedGraphSDK4
 {
-    private readonly GraphServiceClient _graphclient;
+    private readonly GraphServiceClient _graphServiceClient;
 
     public UserResetPasswordDelegatedGraphSDK4(GraphServiceClient graphServiceClient)
     {
-        _graphclient = graphServiceClient;
+        _graphServiceClient = graphServiceClient;
     }
 
     /// <summary>
-    /// User.Read.All and UserAuthenticationMethod.ReadWrite.All permission required
-    /// https://learn.microsoft.com/en-us/graph/api/authenticationmethod-resetpassword?view=graph-rest-1.0&tabs=csharp
+    /// Directory.AccessAsUser.All User.ReadWrite.All UserAuthenticationMethod.ReadWrite.All
     /// </summary>
     public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
-        //_graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
         var password = GetRandomString();
 
-        var user = await _graphclient.Users[oid].GetAsync();
+        var user = await _graphServiceClient.Users[oid]
+            .Request().GetAsync();
 
         if (user == null)
         {
             throw new ArgumentNullException(nameof(oid));
         }
 
-        var methods = await _graphclient
-            .Users[oid].Authentication.Methods.GetAsync();
+        await _graphServiceClient.Users[oid].Request()
+            .UpdateAsync(new User
+            {
+                PasswordProfile = new PasswordProfile
+                {
+                    Password = password,
+                    ForceChangePasswordNextSignIn = true
+                }
+            });
 
-        // "28c10230-6103-485e-b985-444c60001490" == password
-        if (!methods!.Value!.Exists(au => au.Id == "28c10230-6103-485e-b985-444c60001490"))
-        {
-            throw new ArgumentNullException(nameof(oid));
-        }
-
-        var requestBody = new ResetPasswordPostRequestBody
-        {
-            NewPassword = password,
-        };
-
-        try {
-            var result = await _graphclient.Users[oid]
-              .Authentication
-              .Methods["28c10230-6103-485e-b985-444c60001490"]
-              .ResetPassword
-              .PostAsync(requestBody);
-
-            return (user.UserPrincipalName, result!.NewPassword);
-        }
-        catch(Exception ex)
-        {
-            var sss = ex.Message;
-        }
-      
-        return (null, null);
+        return (user.UserPrincipalName, password);
     }
 
-    public async Task<UserCollectionResponse?> FindUsers(string search)
+    public async Task<IGraphServiceUsersCollectionPage?> FindUsers(string search)
     {
-        //_graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
-        var result = await _graphclient.Users.GetAsync((requestConfiguration) =>
-        {
-            requestConfiguration.QueryParameters.Top = 10;
-            if (!string.IsNullOrEmpty(search))
+        var users = await _graphServiceClient.Users.Request()
+            .Filter("userType eq 'Member'")
+            //.Filter($"displayName/any(c:startswith(c/value, '{search}'))")
+            // ("accountEnabled eq true") // onPremisesSyncEnabled eq false
+            .Select(u => new
             {
-                requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
-            }
-            requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
-            requestConfiguration.QueryParameters.Count = true;
-            requestConfiguration.QueryParameters.Select = new string[] { "id", "displayName", "userPrincipalName", "userType" };
-            requestConfiguration.QueryParameters.Filter = "userType eq 'Member'"; // onPremisesSyncEnabled eq false
-            requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
-        });
+                u.Id,
+                u.GivenName,
+                u.Surname,
+                u.DisplayName,
+                u.Mail,
+                u.EmployeeId,
+                u.EmployeeType,
+                u.BusinessPhones,
+                u.MobilePhone,
+                u.AccountEnabled,
+                u.UserPrincipalName
+            })
+            .GetAsync();
 
-        return result;
+        return users;
     }
 
     private static string GetRandomString()

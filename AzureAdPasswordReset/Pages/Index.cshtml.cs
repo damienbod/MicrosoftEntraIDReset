@@ -28,7 +28,7 @@ public class IndexModel : PageModel
 
         var usersCollectionResponse = await _graphUsers.FindUsers(term);
 
-        var users = usersCollectionResponse!.Value!.ToList();
+        var users = usersCollectionResponse!.ToList();
 
         var usersDisplay = users.Select(user => new
         {
