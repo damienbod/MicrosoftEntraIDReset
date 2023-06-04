@@ -1,16 +1,23 @@
 ﻿using Microsoft.Graph.Models;
 using System.Security.Cryptography;
 using Microsoft.Graph.Users.Item.Authentication.Methods.Item.ResetPassword;
+using Microsoft.Identity.Web;
+using Microsoft.Graph;
+using System.Net.Http.Headers;
 
 namespace AzureAdPasswordReset;
 
-public class AadGraphSdkManagedIdentityAppClient
+public class UserResetPasswordDelegated
 {
-    private readonly GraphApplicationClientService _graphService;
+    private readonly ITokenAcquisition _tokenAcquisition;
+    private GraphServiceClient _graphclient;
+    private readonly IHttpClientFactory _clientFactory;
 
-    public AadGraphSdkManagedIdentityAppClient(GraphApplicationClientService graphService)
+    public UserResetPasswordDelegated(ITokenAcquisition tokenAcquisition,
+        IHttpClientFactory clientFactory)
     {
-        _graphService = graphService;
+        _clientFactory = clientFactory;
+        _tokenAcquisition = tokenAcquisition;
     }
 
     /// <summary>
@@ -19,17 +26,17 @@ public class AadGraphSdkManagedIdentityAppClient
     /// </summary>
     public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
+        _graphclient = await GetGraphClient(new string[] { "User.ReadBasic.All", "user.read" });
         var password = GetRandomString();
-        var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
 
-        var user = await graphServiceClient.Users[oid].GetAsync();
+        var user = await _graphclient.Users[oid].GetAsync();
 
         if (user == null)
         {
             throw new ArgumentNullException(nameof(oid));
         }
 
-        var methods = await graphServiceClient
+        var methods = await _graphclient
             .Users[oid].Authentication.Methods.GetAsync();
 
         // "28c10230-6103-485e-b985-444c60001490" == password
@@ -44,7 +51,7 @@ public class AadGraphSdkManagedIdentityAppClient
         };
 
         try {
-            var result = await graphServiceClient.Users[oid]
+            var result = await _graphclient.Users[oid]
               .Authentication
               .Methods["28c10230-6103-485e-b985-444c60001490"]
               .ResetPassword
@@ -57,16 +64,13 @@ public class AadGraphSdkManagedIdentityAppClient
             var sss = ex.Message;
         }
       
-
-
         return (null, null);
     }
 
     public async Task<UserCollectionResponse?> FindUsers(string search)
     {
-        var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
-
-        var result = await graphServiceClient.Users.GetAsync((requestConfiguration) =>
+        _graphclient = await GetGraphClient(new string[] { "User.ReadBasic.All", "user.read" });
+        var result = await _graphclient.Users.GetAsync((requestConfiguration) =>
         {
             requestConfiguration.QueryParameters.Top = 10;
             if (!string.IsNullOrEmpty(search))
@@ -94,4 +98,22 @@ public class AadGraphSdkManagedIdentityAppClient
         return RandomNumberGenerator.GetInt32(100000000, int.MaxValue);
     }
 
+    private async Task<GraphServiceClient> GetGraphClient(string[] scopes)
+    {
+        var token = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+
+        var client = _clientFactory.CreateClient();
+        client.BaseAddress = new Uri("https://graph.microsoft.com/beta");
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        var graphClient = new GraphServiceClient(client)
+        {
+            AuthenticationProvider = new DelegateAuthenticationProvider((requestMessage) => {
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+                return Task.CompletedTask;
+            }),
+            BaseUrl = "https://graph.microsoft.com/beta"
+        };
+        return graphClient;
+    }
 }

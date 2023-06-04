@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Runtime.InteropServices;
 
 namespace AzureAdPasswordReset.Pages;
 
 public class IndexModel : PageModel
 {
-    private AadGraphSdkManagedIdentityAppClient _graphUsers;
+    private UserResetPasswordDelegated _graphUsers;
     public string? SearchText { get; set; }
 
     [BindProperty]
@@ -14,7 +13,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public string? Password { get; set; } = null;
 
-    public IndexModel(AadGraphSdkManagedIdentityAppClient graphUsers)
+    public IndexModel(UserResetPasswordDelegated graphUsers)
     {
         _graphUsers = graphUsers;
     }
