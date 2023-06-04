@@ -26,7 +26,7 @@ public class UserResetPasswordDelegated
     /// </summary>
     public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
-        _graphclient = await GetGraphClient(new string[] { "User.ReadBasic.All", "user.read" });
+        _graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
         var password = GetRandomString();
 
         var user = await _graphclient.Users[oid].GetAsync();
@@ -69,7 +69,7 @@ public class UserResetPasswordDelegated
 
     public async Task<UserCollectionResponse?> FindUsers(string search)
     {
-        _graphclient = await GetGraphClient(new string[] { "User.ReadBasic.All", "user.read" });
+        _graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
         var result = await _graphclient.Users.GetAsync((requestConfiguration) =>
         {
             requestConfiguration.QueryParameters.Top = 10;
@@ -105,15 +105,17 @@ public class UserResetPasswordDelegated
         var client = _clientFactory.CreateClient();
         client.BaseAddress = new Uri("https://graph.microsoft.com/beta");
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
 
-        var graphClient = new GraphServiceClient(client)
-        {
-            AuthenticationProvider = new DelegateAuthenticationProvider((requestMessage) => {
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-                return Task.CompletedTask;
-            }),
-            BaseUrl = "https://graph.microsoft.com/beta"
-        };
+        var graphClient = new GraphServiceClient(client);
+        //{
+           
+        //    AuthenticationProvider = new DelegateAuthenticationProvider((requestMessage) => {
+        //        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+        //        return Task.CompletedTask;
+        //    }),
+        //    BaseUrl = "https://graph.microsoft.com/beta"
+        //};
         return graphClient;
     }
 }
