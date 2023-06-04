@@ -43,8 +43,7 @@ public class UserResetPasswordDelegatedGraphSDK4
     public async Task<IGraphServiceUsersCollectionPage?> FindUsers(string search)
     {
         var users = await _graphServiceClient.Users.Request()
-            .Filter("userType eq 'Member'")
-            //.Filter($"displayName/any(c:startswith(c/value, '{search}'))")
+            .Filter($"startswith(displayName,'{search}') AND userType eq 'Member'")
             // ("accountEnabled eq true") // onPremisesSyncEnabled eq false
             .Select(u => new
             {
