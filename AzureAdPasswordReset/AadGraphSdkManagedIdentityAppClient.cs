@@ -66,7 +66,6 @@ public class AadGraphSdkManagedIdentityAppClient
     {
         var graphServiceClient = _graphService.GetGraphClientWithManagedIdentityOrDevClient();
 
-
         var result = await graphServiceClient.Users.GetAsync((requestConfiguration) =>
         {
             requestConfiguration.QueryParameters.Top = 10;
