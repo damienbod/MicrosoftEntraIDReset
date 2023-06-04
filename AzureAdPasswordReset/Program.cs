@@ -12,7 +12,8 @@ public class Program
         builder.Services.AddDistributedMemoryCache();
 
         //builder.Services.AddSingleton<GraphApplicationClientService>();
-        builder.Services.AddScoped<UserResetPasswordDelegated>();
+        //builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK5>();
+        builder.Services.AddScoped<UserResetPasswordDelegatedGraphSDK4>();
 
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))

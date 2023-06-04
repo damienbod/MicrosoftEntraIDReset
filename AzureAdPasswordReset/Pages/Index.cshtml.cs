@@ -5,7 +5,7 @@ namespace AzureAdPasswordReset.Pages;
 
 public class IndexModel : PageModel
 {
-    private UserResetPasswordDelegated _graphUsers;
+    private readonly UserResetPasswordDelegatedGraphSDK4 _graphUsers;
     public string? SearchText { get; set; }
 
     [BindProperty]
@@ -13,7 +13,7 @@ public class IndexModel : PageModel
     [BindProperty]
     public string? Password { get; set; } = null;
 
-    public IndexModel(UserResetPasswordDelegated graphUsers)
+    public IndexModel(UserResetPasswordDelegatedGraphSDK4 graphUsers)
     {
         _graphUsers = graphUsers;
     }
@@ -32,9 +32,9 @@ public class IndexModel : PageModel
 
         var usersDisplay = users.Select(user => new
         {
-            Id = user.Id,
-            UserPrincipalName = user.UserPrincipalName,
-            DisplayName = user.DisplayName
+            user.Id,
+            user.UserPrincipalName,
+            user.DisplayName
         });
 
         SearchText = term;

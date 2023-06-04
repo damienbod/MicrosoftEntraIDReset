@@ -1,23 +1,17 @@
 ﻿using Microsoft.Graph.Models;
 using System.Security.Cryptography;
 using Microsoft.Graph.Users.Item.Authentication.Methods.Item.ResetPassword;
-using Microsoft.Identity.Web;
 using Microsoft.Graph;
-using System.Net.Http.Headers;
 
 namespace AzureAdPasswordReset;
 
-public class UserResetPasswordDelegated
+public class UserResetPasswordDelegatedGraphSDK4
 {
-    private readonly ITokenAcquisition _tokenAcquisition;
-    private GraphServiceClient _graphclient;
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly GraphServiceClient _graphclient;
 
-    public UserResetPasswordDelegated(ITokenAcquisition tokenAcquisition,
-        IHttpClientFactory clientFactory)
+    public UserResetPasswordDelegatedGraphSDK4(GraphServiceClient graphServiceClient)
     {
-        _clientFactory = clientFactory;
-        _tokenAcquisition = tokenAcquisition;
+        _graphclient = graphServiceClient;
     }
 
     /// <summary>
@@ -26,7 +20,7 @@ public class UserResetPasswordDelegated
     /// </summary>
     public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
-        _graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
+        //_graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
         var password = GetRandomString();
 
         var user = await _graphclient.Users[oid].GetAsync();
@@ -69,7 +63,7 @@ public class UserResetPasswordDelegated
 
     public async Task<UserCollectionResponse?> FindUsers(string search)
     {
-        _graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
+        //_graphclient = await GetGraphClient(new string[] { "User.ReadWrite.All", "UserAuthenticationMethod.ReadWrite.All" });
         var result = await _graphclient.Users.GetAsync((requestConfiguration) =>
         {
             requestConfiguration.QueryParameters.Top = 10;
@@ -96,26 +90,5 @@ public class UserResetPasswordDelegated
     private static int GenerateRandom()
     {
         return RandomNumberGenerator.GetInt32(100000000, int.MaxValue);
-    }
-
-    private async Task<GraphServiceClient> GetGraphClient(string[] scopes)
-    {
-        var token = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
-
-        var client = _clientFactory.CreateClient();
-        client.BaseAddress = new Uri("https://graph.microsoft.com/beta");
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-
-        var graphClient = new GraphServiceClient(client);
-        //{
-           
-        //    AuthenticationProvider = new DelegateAuthenticationProvider((requestMessage) => {
-        //        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
-        //        return Task.CompletedTask;
-        //    }),
-        //    BaseUrl = "https://graph.microsoft.com/beta"
-        //};
-        return graphClient;
     }
 }
