@@ -9,6 +9,8 @@ namespace SelfServiceAzureAdPasswordReset
             // Add services to the container.
             builder.Services.AddRazorPages();
 
+            builder.Services.AddSingleton<GraphApplicationClientService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
