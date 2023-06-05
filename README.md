@@ -2,6 +2,8 @@
 
 [![.NET](https://github.com/damienbod/azuerad-reset/actions/workflows/dotnet.yml/badge.svg)](https://github.com/damienbod/azuerad-reset/actions/workflows/dotnet.yml)
 
+[Reset user account passwords using Microsoft Graph and application permissions](https://damienbod.com)
+
 ## Links
 
 https://aka.ms/mysecurityinfo 
