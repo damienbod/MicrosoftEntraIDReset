@@ -33,7 +33,8 @@ public class UserResetPasswordApplicationGraphSDK4
 
     public async Task<string?> ResetPassword(string email)
     {
-        var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
+        var graphServiceClient = _graphApplicationClientService
+            .GetGraphClientWithManagedIdentityOrDevClient();
 
         var userId = await GetUserIdAsync(email);
 

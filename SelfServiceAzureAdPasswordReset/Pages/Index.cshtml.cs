@@ -8,7 +8,7 @@ namespace SelfServiceAzureAdPasswordReset.Pages
         private readonly UserResetPasswordApplicationGraphSDK4 _userResetPasswordApp;
 
         [BindProperty]
-        public string? Upn { get; set; } = null;
+        public string Upn { get; set; } = string.Empty;
 
         public IndexModel(UserResetPasswordApplicationGraphSDK4 userResetPasswordApplicationGraphSDK4)
         {
@@ -21,15 +21,13 @@ namespace SelfServiceAzureAdPasswordReset.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value.FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(upn))
+            if (!ModelState.IsValid)
             {
-                var result = await _userResetPasswordApp.ResetPassword(upn);
-                Upn = result.Upn;
                 return Page();
             }
 
+            var result = await _userResetPasswordApp.ResetPassword(Upn);
+            
             return Page();
         }
     }
