@@ -10,6 +10,9 @@ namespace SelfServiceAzureAdPasswordReset.Pages
         [BindProperty]
         public string Upn { get; set; } = string.Empty;
 
+        [BindProperty]
+        public string? Password { get; set; } = string.Empty;
+
         public IndexModel(UserResetPasswordApplicationGraphSDK4 userResetPasswordApplicationGraphSDK4)
         {
             _userResetPasswordApp = userResetPasswordApplicationGraphSDK4;
@@ -26,7 +29,7 @@ namespace SelfServiceAzureAdPasswordReset.Pages
                 return Page();
             }
 
-            var result = await _userResetPasswordApp.ResetPassword(Upn);
+            Password = await _userResetPasswordApp.ResetPassword(Upn);
             
             return Page();
         }

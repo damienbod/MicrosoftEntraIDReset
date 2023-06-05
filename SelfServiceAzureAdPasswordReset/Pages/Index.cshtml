@@ -5,22 +5,34 @@
     ViewData["Title"] = "Reset Password";
 }
 
-<form method="post">
+@if (string.IsNullOrEmpty(Model.Password))
+{
+    <form method="post">
 
-    <div class="form-group">
-        <label asp-for="Upn">Email</label>
-        <input type="text" class="form-control" asp-for="Upn" placeholder="mail@mail.ch">
-        <span asp-validation-for="Upn" class="text-danger"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Upn">Email</label>
+            <input type="text" class="form-control" asp-for="Upn" value="liam@damienbodsharepoint.onmicrosoft.com" placeholder="mail@mail.ch">
+            <span asp-validation-for="Upn" class="text-danger"></span>
+        </div>
 
-   
-    <div class="form-group">    
+
+        <div class="form-group">    
             <button type="submit" class="btn btn-primary">Reset Password</button>
+        </div>
+
+    </form>
+}
+else
+{
+    <div class="card">
+        <h5 class="card-header"></h5>
+        <div class="card-body">
+            <p class="card-text">User: <span>@Model.Upn</span></p>
+            <p class="card-text">Password: <span>@Model.Password</span></p>
+            <a href="https://aka.ms/mysecurityinfo" target="_blank">https://aka.ms/mysecurityinfo</a>
+        </div>
     </div>
-
-</form>
-    
-
+}
 
 @section Scripts {
     @{

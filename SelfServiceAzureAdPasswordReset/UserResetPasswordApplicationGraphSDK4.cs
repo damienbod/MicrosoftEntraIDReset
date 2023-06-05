@@ -45,17 +45,17 @@ public class UserResetPasswordApplicationGraphSDK4
 
         var password = GetRandomString();
 
-        await graphServiceClient.Users[userId].Request()
-            .UpdateAsync(new User
-            {
-                PasswordProfile = new PasswordProfile
-                {
-                    Password = password,
-                    ForceChangePasswordNextSignIn = true
-                }
-            });
+        var user = await graphServiceClient.Users[userId].Request()
+       .UpdateAsync(new User
+       {
+           PasswordProfile = new PasswordProfile
+           {
+               Password = password,
+               ForceChangePasswordNextSignIn = true
+           }
+       });
 
-        return string.Empty;
+       return password;
     }
 
     private static string GetRandomString()
