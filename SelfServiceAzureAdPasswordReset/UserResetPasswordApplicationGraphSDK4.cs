@@ -27,7 +27,6 @@ public class UserResetPasswordApplicationGraphSDK4
         return users.CurrentPage[0].Id;
     }
 
-
     public async Task<string?> ResetPassword(string email)
     {
         var graphServiceClient = _graphApplicationClientService
