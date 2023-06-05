@@ -5,13 +5,10 @@ namespace SelfServiceAzureAdPasswordReset;
 
 public class UserResetPasswordApplicationGraphSDK4
 {
-    private readonly IConfiguration _configuration;
     private readonly GraphApplicationClientService _graphApplicationClientService;
 
-    public UserResetPasswordApplicationGraphSDK4(IConfiguration configuration, 
-        GraphApplicationClientService graphApplicationClientService)
+    public UserResetPasswordApplicationGraphSDK4(GraphApplicationClientService graphApplicationClientService)
     {
-        _configuration = configuration;
         _graphApplicationClientService = graphApplicationClientService;
     }
 
@@ -40,22 +37,22 @@ public class UserResetPasswordApplicationGraphSDK4
 
         if (userId == null)
         {
-            throw new ArgumentNullException(nameof(userId));
+            throw new ArgumentNullException(nameof(email));
         }
 
         var password = GetRandomString();
 
-        var user = await graphServiceClient.Users[userId].Request()
-       .UpdateAsync(new User
-       {
-           PasswordProfile = new PasswordProfile
-           {
-               Password = password,
-               ForceChangePasswordNextSignIn = true
-           }
-       });
+        await graphServiceClient.Users[userId].Request()
+        .UpdateAsync(new User
+        {
+            PasswordProfile = new PasswordProfile
+            {
+                Password = password,
+                ForceChangePasswordNextSignIn = true
+            }
+        });
 
-       return password;
+        return password;
     }
 
     private static string GetRandomString()
