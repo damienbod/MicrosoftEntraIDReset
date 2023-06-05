@@ -5,16 +5,32 @@ namespace SelfServiceAzureAdPasswordReset.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
+        private readonly UserResetPasswordApplicationGraphSDK4 _userResetPasswordApp;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        [BindProperty]
+        public string? Upn { get; set; } = null;
+
+        public IndexModel(UserResetPasswordApplicationGraphSDK4 userResetPasswordApplicationGraphSDK4)
         {
-            _logger = logger;
+            _userResetPasswordApp = userResetPasswordApplicationGraphSDK4;
         }
 
         public void OnGet()
         {
+        }
 
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var upn = Request.Form.FirstOrDefault(u => u.Key == "userPrincipalName").Value.FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(upn))
+            {
+                var result = await _userResetPasswordApp.SendEmailAsync();
+                Upn = result.Upn;
+                return Page();
+            }
+
+            return Page();
         }
     }
 }

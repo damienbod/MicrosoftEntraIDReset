@@ -10,6 +10,7 @@ namespace SelfServiceAzureAdPasswordReset
             builder.Services.AddRazorPages();
 
             builder.Services.AddSingleton<GraphApplicationClientService>();
+            builder.Services.AddScoped<UserResetPasswordApplicationGraphSDK4>();
 
             var app = builder.Build();
 
