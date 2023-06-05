@@ -25,7 +25,7 @@ namespace SelfServiceAzureAdPasswordReset.Pages
 
             if (!string.IsNullOrEmpty(upn))
             {
-                var result = await _userResetPasswordApp.SendEmailAsync();
+                var result = await _userResetPasswordApp.ResetPassword(upn);
                 Upn = result.Upn;
                 return Page();
             }

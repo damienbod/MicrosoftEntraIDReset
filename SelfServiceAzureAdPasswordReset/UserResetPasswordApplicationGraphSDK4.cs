@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph;
+using System.Security.Cryptography;
 
 namespace SelfServiceAzureAdPasswordReset;
 
@@ -14,11 +15,12 @@ public class UserResetPasswordApplicationGraphSDK4
         _graphApplicationClientService = graphApplicationClientService;
     }
 
-    private async Task<string> GetUserIdAsync()
+    private async Task<string> GetUserIdAsync(string email)
     {
-        var meetingOrganizer = _configuration["AzureAd:MeetingOrganizer"];
-        var filter = $"startswith(userPrincipalName,'{meetingOrganizer}')";
-        var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
+        var filter = $"startswith(userPrincipalName,'{email}')";
+
+        var graphServiceClient = _graphApplicationClientService
+            .GetGraphClientWithManagedIdentityOrDevClient();
 
         var users = await graphServiceClient.Users
             .Request()
@@ -28,53 +30,41 @@ public class UserResetPasswordApplicationGraphSDK4
         return users.CurrentPage[0].Id;
     }
 
-    public async Task SendEmailAsync(Message message)
+
+    public async Task<string?> ResetPassword(string email)
     {
         var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
 
-        var saveToSentItems = true;
+        var userId = await GetUserIdAsync(email);
 
-        var userId = await GetUserIdAsync();
+        if (userId == null)
+        {
+            throw new ArgumentNullException(nameof(userId));
+        }
 
-        await graphServiceClient.Users[userId]
-            .SendMail(message, saveToSentItems)
-            .Request()
-            .PostAsync();
+        var password = GetRandomString();
+
+        await graphServiceClient.Users[userId].Request()
+            .UpdateAsync(new User
+            {
+                PasswordProfile = new PasswordProfile
+                {
+                    Password = password,
+                    ForceChangePasswordNextSignIn = true
+                }
+            });
+
+        return string.Empty;
     }
 
-    public async Task<OnlineMeeting> CreateOnlineMeeting(OnlineMeeting onlineMeeting)
+    private static string GetRandomString()
     {
-        var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
-
-        var userId = await GetUserIdAsync();
-
-        return await graphServiceClient.Users[userId]
-            .OnlineMeetings
-            .Request()
-            .AddAsync(onlineMeeting);
+        var random = $"{GenerateRandom()}{GenerateRandom()}{GenerateRandom()}{GenerateRandom()}-AC";
+        return random;
     }
 
-    public async Task<OnlineMeeting> UpdateOnlineMeeting(OnlineMeeting onlineMeeting)
+    private static int GenerateRandom()
     {
-        var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
-
-        var userId = await GetUserIdAsync();
-
-        return await graphServiceClient.Users[userId]
-            .OnlineMeetings[onlineMeeting.Id]
-            .Request()
-            .UpdateAsync(onlineMeeting);
-    }
-
-    public async Task<OnlineMeeting> GetOnlineMeeting(string onlineMeetingId)
-    {
-        var graphServiceClient = _graphApplicationClientService.GetGraphClientWithManagedIdentityOrDevClient();
-
-        var userId = await GetUserIdAsync();
-
-        return await graphServiceClient.Users[userId]
-            .OnlineMeetings[onlineMeetingId]
-            .Request()
-            .GetAsync();
+        return RandomNumberGenerator.GetInt32(100000000, int.MaxValue);
     }
 }
