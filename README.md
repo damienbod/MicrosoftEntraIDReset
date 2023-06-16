@@ -4,6 +4,10 @@
 
 [Reset user account passwords using Microsoft Graph and application permissions](https://damienbod.com)
 
+## History
+
+2023-06-16 Updated nuget packages
+
 ## Links
 
 https://aka.ms/mysecurityinfo 
