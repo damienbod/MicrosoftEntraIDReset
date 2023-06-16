@@ -6,7 +6,7 @@
 
 ## History
 
-2023-06-16 Updated nuget packages
+2023-06-16 Updated nuget packages, added Graph SDK 5 example
 
 ## Links
 
