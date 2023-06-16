@@ -29,8 +29,8 @@ public class UserResetPasswordDelegatedGraphSDK5
             throw new ArgumentNullException(nameof(oid));
         }
 
-        await _graphServiceClient.Users[oid]
-            .UpdateAsync(new User
+        await _graphServiceClient.Users[oid].PatchAsync(
+            new User
             {
                 PasswordProfile = new PasswordProfile
                 {
@@ -38,6 +38,7 @@ public class UserResetPasswordDelegatedGraphSDK5
                     ForceChangePasswordNextSignIn = true
                 }
             });
+
 
         return (user.UserPrincipalName, password);
     }
