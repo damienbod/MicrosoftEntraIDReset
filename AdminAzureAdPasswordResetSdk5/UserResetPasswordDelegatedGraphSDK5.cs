@@ -39,7 +39,6 @@ public class UserResetPasswordDelegatedGraphSDK5
                 }
             });
 
-
         return (user.UserPrincipalName, password);
     }
 
