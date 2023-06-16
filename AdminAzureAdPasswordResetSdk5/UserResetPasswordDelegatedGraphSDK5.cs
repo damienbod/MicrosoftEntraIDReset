@@ -50,7 +50,7 @@ public class UserResetPasswordDelegatedGraphSDK5
             requestConfiguration.QueryParameters.Top = 10;
             if (!string.IsNullOrEmpty(search))
             {
-                requestConfiguration.QueryParameters.Search = $"\"userPrincipalName:{search}\"";
+                requestConfiguration.QueryParameters.Search = $"\"displayName:{search}\"";
             }
             requestConfiguration.QueryParameters.Orderby = new string[] { "displayName" };
             requestConfiguration.QueryParameters.Count = true;
