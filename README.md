@@ -4,6 +4,8 @@
 
 [Reset user account passwords using Microsoft Graph and application permissions in ASP.NET Core](https://damienbod.com/2023/06/12/reset-user-account-passwords-using-microsoft-graph-and-application-permissions/)
 
+[Reset passwords in ASP.NET Core using delegated permissions and Microsoft Graph](https://damienbod.com/2023/06/19/reset-passwords-in-asp-net-core-using-delegated-permissions-and-microsoft-graph/)
+
 ## History
 
 2023-06-18 Updated nuget packages, added Graph SDK 5 example
