@@ -18,16 +18,14 @@ public class UserResetPasswordDelegatedGraphSDK5
     /// </summary>
     public async Task<(string? Upn, string? Password)> ResetPassword(string oid)
     {
-        var password = GetRandomString();
-
         var user = await _graphServiceClient
             .Users[oid]
             .GetAsync();
 
         if (user == null)
-        {
             throw new ArgumentNullException(nameof(oid));
-        }
+
+        var password = GetRandomString();
 
         await _graphServiceClient.Users[oid].PatchAsync(
             new User
