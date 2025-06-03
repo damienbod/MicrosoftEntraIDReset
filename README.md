@@ -13,8 +13,8 @@
 - 2024-06-22 Updated packages
 - 2024-01-14 Updated packages
 - 2023-11-21 Updated .NET 8
-- 2023-11-03 Updated nuget packages
-- 2023-06-18 Updated nuget packages, added Graph SDK 5 example
+- 2023-11-03 Updated Nuget packages
+- 2023-06-18 Updated Nuget packages, added Graph SDK 5 example
 
 ## Links
 
